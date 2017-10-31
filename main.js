@@ -1,5 +1,5 @@
 /**
- * This example is based in the tutorial at
+ * This example is based on the tutorial at
  *    http://www.kamaron.me/webgl-tutorial/02-rotating-cube
  *
  * @author  Ikaros Kappler
@@ -12,7 +12,7 @@
     
     var gl;
     var canvas;
-    var projMatrix;
+    var viewMatrix, projMatrix;
     
     var init = function() {
 	canvas = document.getElementById('canvas');
@@ -31,7 +31,17 @@
 
 		       initShaders();
 
-		       canvasFullpage( canvas, gl );
+		       
+		       canvasFullpage( canvas,
+				       function( _canvas, _w, _h ) {
+					   // Update the perspective if the canvas size changed!
+					   mat4.perspective(projMatrix, glMatrix.toRadian(45), canvas.width / canvas.height, 0.1, 1000.0);
+					   //mat4.perspective(projMatrix, glMatrix.toRadian(45), _w/_h, 0.1, 1000.0);
+					   //mat4.lookAt(viewMatrix, vec3.fromValues(0, 0, -8), vec3.fromValues(0, 0, 0), vec3.fromValues(0, 1, 0));
+					   //gl.viewport(0,0,_w,_h);
+				       }
+				     );
+		       
 		       
 		       start();
 		   },
@@ -64,7 +74,7 @@
 	
 	gl.useProgram(shaderProgram);
 	
-	vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
+	vertexPositionAttribute = gl.getAttribLocation(shaderProgram, 'aVertexPosition');
 	gl.enableVertexAttribArray(vertexPositionAttribute);
     };
 
@@ -200,20 +210,9 @@
 	var matWorldUniformLocation = gl.getUniformLocation(program, 'mWorld');
 	var matViewUniformLocation = gl.getUniformLocation(program, 'mView');
 	var matProjUniformLocation = gl.getUniformLocation(program, 'mProj');
-
-	/*
-	var worldMatrix = new Float32Array(16);
-	var viewMatrix = new Float32Array(16);
-	var projMatrix = new Float32Array(16);
-	mat4.identity(worldMatrix);
-	mat4.lookAt(viewMatrix, [0, 0, -8], [0, 0, 0], [0, 1, 0]);
-	mat4.perspective(projMatrix, glMatrix.toRadian(45), canvas.width / canvas.height, 0.1, 1000.0);
-
-	var matProjUniformLocation = gl.getUniformLocation(program, 'mProj');
-	*/
-	
+		
 	var worldMatrix = mat4.create();
-	var viewMatrix = mat4.create();
+	viewMatrix = mat4.create();
 	projMatrix = mat4.create();
 	mat4.identity(worldMatrix);
 	mat4.lookAt(viewMatrix, vec3.fromValues(0, 0, -8), vec3.fromValues(0, 0, 0), vec3.fromValues(0, 1, 0));
@@ -224,20 +223,6 @@
 	gl.uniformMatrix4fv(matViewUniformLocation, gl.FALSE, viewMatrix);
 	gl.uniformMatrix4fv(matProjUniformLocation, gl.FALSE, projMatrix);
  
-	//
-	// Main render loop
-	//
-	/*
-	var loop = function () {
-            gl.clearColor(0.75, 0.85, 0.8, 1.0);
-            gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
-            gl.drawElements(gl.TRIANGLES, boxIndices.length, gl.UNSIGNED_SHORT, 0);
-	    
-            requestAnimationFrame(loop);
-	};
-	requestAnimationFrame(loop);
-	*/
-
 	var xRotationMatrix = new Float32Array(16);
 	var yRotationMatrix = new Float32Array(16);
 	
@@ -254,7 +239,8 @@
             mat4.mul(worldMatrix, yRotationMatrix, xRotationMatrix);
             gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
 
-	    mat4.perspective(projMatrix, glMatrix.toRadian(45), canvas.width / canvas.height, 0.1, 1000.0);
+	    // Update the perspective if the canvas size changed!
+	    //mat4.perspective(projMatrix, glMatrix.toRadian(45), canvas.width / canvas.height, 0.1, 1000.0);
 	    
             gl.clearColor(0.75, 0.85, 0.8, 1.0);
             gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);

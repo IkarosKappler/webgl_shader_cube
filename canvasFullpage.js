@@ -6,7 +6,11 @@
  * @version 1.0.0
  **/
 
-var canvasFullpage = function( canvas ) {
+var canvasFullpage = function( canvas, onChange ) {
+    var fireEvent = function(_w,_h) {
+	if( typeof onchange == 'function' )
+	    onChange( canvas, w, h );
+    };
     var handler = function(e) {
 	var w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 	var h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
@@ -15,6 +19,11 @@ var canvasFullpage = function( canvas ) {
 
 	canvas.setAttribute('width',w);
 	canvas.setAttribute('height',h);
+
+	canvas.style.width = ''+w+'px';
+	canvas.style.height = ''+h+'px';
+
+	fireEvent(w,h);
     };
     window.addEventListener('resize', handler );
     handler( null );
