@@ -30,20 +30,20 @@
 		       gl.cullFace(gl.BACK);
 
 		       initShaders();
+ 
+		       start();
 
-		       
 		       canvasFullpage( canvas,
 				       function( _canvas, _w, _h ) {
+					   console.log('updating viewport');
 					   // Update the perspective if the canvas size changed!
 					   mat4.perspective(projMatrix, glMatrix.toRadian(45), canvas.width / canvas.height, 0.1, 1000.0);
 					   //mat4.perspective(projMatrix, glMatrix.toRadian(45), _w/_h, 0.1, 1000.0);
+					   //mat4.perspective(projMatrix, glMatrix.toRadian(45), 640.0/480.0, 0.1, 1000.0);
 					   //mat4.lookAt(viewMatrix, vec3.fromValues(0, 0, -8), vec3.fromValues(0, 0, 0), vec3.fromValues(0, 1, 0));
-					   //gl.viewport(0,0,_w,_h);
+					   gl.viewport(0,0,640,480); //canvas.width,canvas.height);
 				       }
 				     );
-		       
-		       
-		       start();
 		   },
 		   function(errmsg) {
 		       console.warn( errmsg );
@@ -74,7 +74,7 @@
 	
 	gl.useProgram(shaderProgram);
 	
-	vertexPositionAttribute = gl.getAttribLocation(shaderProgram, 'aVertexPosition');
+	vertexPositionAttribute = gl.getAttribLocation(shaderProgram, 'vertPosition' ); // 'aVertexPosition');
 	gl.enableVertexAttribArray(vertexPositionAttribute);
     };
 
@@ -169,6 +169,56 @@
 		22, 20, 23
 	    ];
 
+	// --- TEST: MAKE NORMALS FOR VERTICES
+	
+	var cubeVerticesNormalBuffer = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesNormalBuffer);
+	
+	var vertexNormals = [
+	    // vorne
+	    0.0,  0.0,  1.0,
+	    0.0,  0.0,  1.0,
+	    0.0,  0.0,  1.0,
+	    0.0,  0.0,  1.0,
+	    
+	    // hinten
+	    0.0,  0.0, -1.0,
+	    0.0,  0.0, -1.0,
+	    0.0,  0.0, -1.0,
+	    0.0,  0.0, -1.0,
+	    
+	    // oben
+	    0.0,  1.0,  0.0,
+	    0.0,  1.0,  0.0,
+	    0.0,  1.0,  0.0,
+	    0.0,  1.0,  0.0,
+	    
+	    // unten
+	    0.0, -1.0,  0.0,
+	    0.0, -1.0,  0.0,
+	    0.0, -1.0,  0.0,
+	    0.0, -1.0,  0.0,
+	    
+	    // rechts
+	    1.0,  0.0,  0.0,
+	    1.0,  0.0,  0.0,
+	    1.0,  0.0,  0.0,
+	    1.0,  0.0,  0.0,
+	    
+	    // links
+		-1.0,  0.0,  0.0,
+		-1.0,  0.0,  0.0,
+		-1.0,  0.0,  0.0,
+		-1.0,  0.0,  0.0
+	];
+	
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexNormals), gl.STATIC_DRAW);
+
+	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesNormalBuffer);
+	//gl.vertexAttribPointer(vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
+	
+	// --- END TEST: MAKE NORMALS FOR VERTICES
+
 	var boxVertexBufferObject = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, boxVertexBufferObject);
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(boxVertices), gl.STATIC_DRAW);
@@ -241,6 +291,16 @@
 
 	    // Update the perspective if the canvas size changed!
 	    //mat4.perspective(projMatrix, glMatrix.toRadian(45), canvas.width / canvas.height, 0.1, 1000.0);
+
+	    // --- LIGHTING
+	    /*
+	    var normalMatrix = mvMatrix.inverse();
+	    normalMatrix = normalMatrix.transpose();
+	    var nUniform = gl.getUniformLocation(shaderProgram, "uNormalMatrix");
+	    gl.uniformMatrix4fv(nUniform, false, new Float32Array(normalMatrix.flatten()));
+	    */
+	    // --- END LIGHTING
+	    
 	    
             gl.clearColor(0.75, 0.85, 0.8, 1.0);
             gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);

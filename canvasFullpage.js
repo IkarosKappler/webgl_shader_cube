@@ -8,8 +8,8 @@
 
 var canvasFullpage = function( canvas, onChange ) {
     var fireEvent = function(_w,_h) {
-	if( typeof onchange == 'function' )
-	    onChange( canvas, w, h );
+	if( typeof onChange == 'function' )
+	    onChange( canvas, _w, _h );
     };
     var handler = function(e) {
 	var w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
